@@ -1,0 +1,38 @@
+name: Update
+
+on:
+  push:
+  schedule:
+    - cron: 30 20 * * *
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Step 1 - Checkout
+      uses: actions/checkout@v2
+    - name: Step 2 - Build
+      run: |
+        rm -f ./Clash.exe
+        Clash=$(wget -qO- https://api.github.com/repos/Fndroid/clash_for_windows_pkg/releases | grep -o '"tag_name": ".*"' | head -n 1 | sed 's/"//g' | sed 's/tag_name: //g')
+        wget -T 15 -t 30 -c --retry-connrefused https://github.com/Fndroid/clash_for_windows_pkg/releases/download/${Clash}/Clash.for.Windows.Setup.${Clash}.exe -O ./Clash.exe
+        rm -f ./Clash.apk
+        ClashA=$(wget -qO- https://api.github.com/repos/Kr328/ClashForAndroid/releases | grep -o '"tag_name": ".*"' | head -n 1 | sed 's/"//g' | sed 's/tag_name: //g' | sed 's/v//g')
+        wget -T 15 -t 30 -c --retry-connrefused https://github.com/Kr328/ClashForAndroid/releases/download/v${ClashA}/cfa-${ClashA}-premium-universal-release.apk -O ./Clash.apk
+        rm -f ./Clash.dmg
+        ClashX=$(wget -qO- https://api.github.com/repos/yichengchen/clashX/releases | grep -o '"tag_name": ".*"' | head -n 1 | sed 's/"//g' | sed 's/tag_name: //g')
+        wget -T 15 -t 30 -c --retry-connrefused https://github.com/yichengchen/clashX/releases/download/${ClashX}/ClashX.dmg -O ./Clash.dmg
+        rm -f ./V2Ray.7z
+        V2RayN=$(wget -qO- https://api.github.com/repos/2dust/v2rayN/releases | grep -o '"tag_name": ".*"' | head -n 1 | sed 's/"//g' | sed 's/tag_name: //g')
+        wget -T 15 -t 30 -c --retry-connrefused https://github.com/2dust/v2rayN/releases/download/${V2RayN}/v2rayN-With-Core.7z -O ./V2Ray.7z
+        rm -f ./V2Ray.apk
+        V2RayNG=$(wget -qO- https://api.github.com/repos/2dust/v2rayNG/releases | grep -o '"tag_name": ".*"' | head -n 1 | sed 's/"//g' | sed 's/tag_name: //g')
+        wget -T 15 -t 30 -c --retry-connrefused https://github.com/2dust/v2rayNG/releases/download/${V2RayNG}/v2rayNG_${V2RayNG}_arm64-v8a.apk -O ./V2Ray.apk
+        git config --global user.name HashVPN
+        git config --global user.email linnazhe510@gmail.com
+        git checkout --orphan latest_branch
+        git add -A
+        git commit -am "Update"
+        git branch -D main
+        git branch -m main
+        git push -f origin main
